@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MORAFIQ PRO – النظام المهني السري</title>
+<style>
+:root{--navy:#16384b;--teal:#168477;--muted:#607784;--line:#dce7eb;--bg:#f3f7f8}
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:#203744;line-height:1.8}
+header{background:#fff;border-bottom:1px solid var(--line);padding:16px 5%}
+.brand{font-size:23px;font-weight:800;color:var(--navy)}.brand span{color:var(--teal)}
+main{max-width:1040px;margin:38px auto;padding:0 18px}
+.hero{background:#fff;border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:0 10px 35px #16384b0b}
+.kicker{color:var(--teal);font-size:12px;font-weight:700}
+h1{font-size:30px;line-height:1.5;color:var(--navy);margin:8px 0}
+.lead{color:var(--muted);max-width:780px}
+.alert{background:#fff8e8;border:1px solid #f0dfb7;color:#74551d;border-radius:13px;padding:14px;margin:22px 0;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:24px 0}
+.card{background:#f8fbfc;border:1px solid var(--line);border-radius:14px;padding:17px}
+.card h3{margin:0 0 7px;color:var(--navy);font-size:16px}.card p{margin:0;color:var(--muted);font-size:12px}
+.status{display:inline-block;background:#e9f4f1;color:#17695f;border-radius:30px;padding:5px 12px;font-size:11px;font-weight:700}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+a.btn{display:inline-block;text-decoration:none;padding:10px 17px;border-radius:9px;font-size:13px;font-weight:700}
+.primary{background:var(--teal);color:white}.secondary{border:1px solid var(--line);color:var(--navy);background:#fff}
+footer{text-align:center;color:#82939c;font-size:11px;padding:30px}
+</style>
+</head>
+<body>
+<header><div class="brand">MORAFIQ <span>PRO</span></div></header>
+<main>
+ <section class="hero">
+  <div class="kicker">النظام المهني الداخلي</div>
+  <h1>فضاء سري لمهنيي التوجيه والإرشاد المدرسي والمهني</h1>
+  <p class="lead">هذا الفضاء منفصل عن الموقع العام، ومخصص لإدارة الملفات التربوية والمقابلات والمتابعة المهنية وفق صلاحيات محددة.</p>
+  <span class="status">واجهة أولية – غير مفعّلة بعد</span>
+  <div class="alert"><b>تنبيه حماية:</b> لا تُدخل حالياً أسماء التلاميذ أو بياناتهم أو محاضر المقابلات. لم يتم ربط هذه الواجهة بعد بمصادقة حقيقية أو قاعدة بيانات محمية. وجود صفحة منفصلة أو إخفاء رابط لا يُعدّ حماية أمنية.</div>
+  <div class="grid">
+   <div class="card"><h3>ملفات التلاميذ</h3><p>مساحة مخصصة للبيانات التربوية الضرورية، لا تظهر إلا للمستخدمين المخولين.</p></div>
+   <div class="card"><h3>المقابلات المهنية</h3><p>سجل سري للمقابلات والملاحظات والتوصيات وخطط المتابعة.</p></div>
+   <div class="card"><h3>نتائج الاستبيانات</h3><p>عرض النتائج بموافقة مناسبة، مع تجنب استخدامها كتشخيص أو تصنيف ثابت.</p></div>
+   <div class="card"><h3>إدارة الصلاحيات</h3><p>ربط كل مستخدم بمركزه ودوره ونطاق الملفات المسموح له بالاطلاع عليها.</p></div>
+  </div>
+  <h2 style="color:var(--navy);font-size:19px">متطلبات التفعيل قبل استقبال أي بيانات حقيقية</h2>
+  <ol style="color:var(--muted);font-size:13px">
+   <li>تفعيل Supabase Auth والتحقق من البريد وإجراءات استعادة الحساب.</li>
+   <li>تحديد الأدوار: مدير النظام، مدير المركز، المستشار، والولي.</li>
+   <li>تطبيق Row Level Security على كل جدول، مع اختبار منع الوصول المتبادل بين المراكز.</li>
+   <li>حفظ الوثائق في مخازن خاصة مع سياسات وصول مقيّدة وروابط مؤقتة عند الحاجة.</li>
+   <li>تسجيل عمليات الاطلاع والتعديل والتصدير، ووضع سياسة احتفاظ وحذف للبيانات.</li>
+   <li>اختبار الصلاحيات بحسابات منفصلة قبل الإطلاق.</li>
+  </ol>
+  <div class="actions">
+   <a class="btn secondary" href="Morafiq_Public_V4.html">العودة إلى الموقع العام</a>
+  </div>
+ </section>
+</main>
+<footer>مرافِق – حماية خصوصية التلميذ وسرية المقابلات مسؤولية أساسية</footer>
+</body>
+</html>
