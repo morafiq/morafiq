@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MORAFIQ | لوحة مدير الموقع</title>
+<style>
+:root{--navy:#17384b;--teal:#168477;--bg:#f3f7f8;--line:#dce6eb;--muted:#6b7e89;--red:#b64242;--gold:#9b6b17}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Tahoma,Arial,sans-serif;color:#203744;line-height:1.7}
+header{background:var(--navy);color:#fff;padding:16px 5%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:21px;font-weight:800}.brand span{color:#8fe0d0}
+main{max-width:1100px;margin:30px auto;padding:0 16px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 28px #17384b0b;margin-bottom:18px}
+h1{font-size:25px;color:var(--navy);margin:0 0 8px}h2{font-size:18px;color:var(--navy);margin:0 0 12px}
+.muted{color:var(--muted);font-size:13px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 5px}
+input,textarea{width:100%;border:1px solid #cfdce2;border-radius:9px;padding:12px;font:inherit;background:#fff}
+button{border:0;border-radius:9px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--teal);color:#fff}.secondary{background:#edf3f5;color:var(--navy)}.danger{background:#fff0f0;color:var(--red)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:0 0 auto}
+.hidden{display:none!important}.notice{padding:12px;border-radius:10px;margin:12px 0;font-size:13px;background:#eef6f5;color:#245f58}
+.notice.error{background:#fff0f0;color:#963c3c}.notice.warn{background:#fff8e8;color:#805b19}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0}
+.stat{border:1px solid var(--line);border-radius:13px;padding:15px;background:#fbfdfe}.stat b{font-size:25px;color:var(--teal);display:block}
+.request{border:1px solid var(--line);border-radius:13px;padding:15px;margin:10px 0}
+.request h3{font-size:16px;margin:0 0 5px;color:var(--navy)}
+.request p{font-size:12px;color:var(--muted);margin:3px 0}
+.pill{display:inline-block;border-radius:30px;padding:3px 9px;font-size:11px;background:#fff5df;color:var(--gold)}
+.small{font-size:11px;color:var(--muted)}
+@media(max-width:600px){.panel{padding:16px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<header><div class="brand">MORAFIQ <span>ADMIN</span></div><div class="small" style="color:#d5e5eb">لوحة إدارة المنصة</div></header>
+<main>
+<section class="panel" id="loginPanel">
+ <h1>دخول مدير الموقع</h1>
+ <p class="muted">هذه الصفحة مخصصة لحساب مدير المنصة المعتمد مسبقاً في قاعدة البيانات.</p>
+ <div class="notice warn">لا تنشئ حساب المدير من هذه الصفحة. يجب أن يكون دور super_admin قد مُنح مسبقاً من SQL Editor.</div>
+ <form id="loginForm">
+  <label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required>
+  <label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required>
+  <div class="row" style="margin-top:16px"><button class="primary" type="submit">تسجيل الدخول</button></div>
+ </form>
+ <div id="loginMsg" class="notice hidden" role="status"></div>
+</section>
+<section id="dashboard" class="hidden">
+ <div class="panel">
+  <div class="row" style="justify-content:space-between">
+   <div><h1>لوحة مدير الموقع</h1><div class="muted" id="adminEmail"></div></div>
+   <button class="secondary" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+  <div id="dashMsg" class="notice hidden" role="status"></div>
+  <div class="cards">
+   <div class="stat"><span class="muted">طلبات المراكز المعلقة</span><b id="pendingCount">—</b></div>
+   <div class="stat"><span class="muted">المراكز المعتمدة</span><b id="centersCount">—</b></div>
+   <div class="stat"><span class="muted">حالة الحساب</span><b style="font-size:17px">مدير معتمد</b></div>
+  </div>
+ </div>
+ <div class="panel">
+  <div class="row" style="justify-content:space-between">
+   <h2>طلبات تسجيل المراكز</h2><button class="secondary" id="refreshBtn">تحديث القائمة</button>
+  </div>
+  <p class="muted">تظهر هنا الطلبات المعلقة فقط. قبول المركز ينشئ المركز ويمنح مقدم الطلب دور مدير المركز.</p>
+  <div id="requestsList"><p class="muted">جارٍ تحميل الطلبات…</p></div>
+ </div>
+</section>
+<footer class="small" style="text-align:center;padding:15px">MORAFIQ · الوصول مقيد بصلاحيات قاعدة البيانات وليس بمجرد إخفاء الصفحة.</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://ajkeqecpteeminiteptd.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qW34UJhJ4jLLdMTKorWMUg_aNOc26iT";
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const $ = id => document.getElementById(id);
+function message(id,text,isError=false){const el=$(id);el.textContent=text;el.classList.remove("hidden","error");if(isError)el.classList.add("error");}
+function clearMessage(id){$(id).classList.add("hidden");}
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+async function verifyAdmin(){
+ const {data:{user},error}=await client.auth.getUser();
+ if(error||!user){$("loginPanel").classList.remove("hidden");$("dashboard").classList.add("hidden");return false;}
+ const {data:roles,error:roleError}=await client.from("mf_user_roles").select("role").eq("user_id",user.id);
+ if(roleError){message("loginMsg","تعذر التحقق من الصلاحيات: "+roleError.message,true);return false;}
+ if(!(roles||[]).some(x=>x.role==="super_admin")){
+  await client.auth.signOut();
+  message("loginMsg","هذا الحساب لا يحمل صلاحية مدير الموقع (super_admin).",true);
+  $("loginPanel").classList.remove("hidden");$("dashboard").classList.add("hidden");return false;
+ }
+ $("loginPanel").classList.add("hidden");$("dashboard").classList.remove("hidden");
+ $("adminEmail").textContent=user.email||"حساب مدير الموقع";
+ await loadDashboard();return true;
+}
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();clearMessage("loginMsg");
+ const {error}=await client.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(error){message("loginMsg","تعذر تسجيل الدخول: "+error.message,true);return;}
+ await verifyAdmin();
+});
+$("logoutBtn").addEventListener("click",async()=>{await client.auth.signOut();$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden");});
+$("refreshBtn").addEventListener("click",loadDashboard);
+async function loadDashboard(){
+ clearMessage("dashMsg");$("requestsList").innerHTML='<p class="muted">جارٍ تحميل الطلبات…</p>';
+ const [reqRes,centRes]=await Promise.all([
+  client.from("mf_center_requests").select("id,requester_user_id,center_name,wilaya,status,created_at").eq("status","pending").order("created_at",{ascending:false}),
+  client.from("mf_centers").select("id",{count:"exact",head:true}).eq("status","approved")
+ ]);
+ if(reqRes.error){$("requestsList").innerHTML="";message("dashMsg","تعذر تحميل طلبات المراكز: "+reqRes.error.message,true);return;}
+ $("pendingCount").textContent=(reqRes.data||[]).length;
+ $("centersCount").textContent=centRes.error?"—":(centRes.count??0);
+ renderRequests(reqRes.data||[]);
+}
+function renderRequests(rows){
+ const box=$("requestsList");
+ if(!rows.length){box.innerHTML='<div class="notice">لا توجد طلبات مراكز معلقة حالياً.</div>';return;}
+ box.innerHTML=rows.map(r=>`<article class="request">
+  <div class="row" style="justify-content:space-between"><h3>${safe(r.center_name)}</h3><span class="pill">قيد المراجعة</span></div>
+  <p>الولاية: ${safe(r.wilaya)}</p><p>تاريخ الطلب: ${safe(new Date(r.created_at).toLocaleString("ar-DZ"))}</p>
+  <p>معرّف مقدم الطلب: ${safe(r.requester_user_id)}</p>
+  <label for="note-${safe(r.id)}">ملاحظة إدارية (اختيارية)</label><input id="note-${safe(r.id)}" maxlength="1000" placeholder="سبب القرار أو ملاحظة داخلية">
+  <div class="row" style="margin-top:12px">
+   <button class="primary" data-action="approve" data-id="${safe(r.id)}">قبول المركز</button>
+   <button class="danger" data-action="reject" data-id="${safe(r.id)}">رفض الطلب</button>
+  </div></article>`).join("");
+ box.querySelectorAll("button[data-action]").forEach(btn=>btn.addEventListener("click",()=>decideCenter(btn.dataset.id,btn.dataset.action==="approve")));
+}
+async function decideCenter(id,approve){
+ const action=approve?"قبول المركز":"رفض الطلب";
+ if(!confirm("هل تريد تأكيد "+action+"؟"))return;
+ const note=$("note-"+id)?.value||null;
+ const {error}=await client.rpc("mf_review_center_request",{p_request_id:id,p_approve:approve,p_note:note});
+ if(error){message("dashMsg","لم يتم تنفيذ القرار: "+error.message,true);return;}
+ message("dashMsg",approve?"تم اعتماد المركز ومنح مقدم الطلب دور مدير المركز.":"تم رفض طلب المركز.");
+ await loadDashboard();
+}
+(async()=>{const {data:{session}}=await client.auth.getSession();if(session)await verifyAdmin();})();
+</script>
+</body>
+</html>
